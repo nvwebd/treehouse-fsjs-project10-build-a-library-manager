@@ -1,0 +1,30 @@
+{
+  "name": "treehouse-fsjs-project10-build-a-library-manager",
+  "version": "0.1.0",
+  "description": "### Working with databases — storing, retrieving, updating and deleting information — is an important software developer talent. Create a web application for searching, adding and updating items in a lending library, using JavaScript, Node.js, Express, and an Sqlite Database.",
+  "main": "index.js",
+  "dependencies": {
+    "express": "^4.16.4",
+    "pug": "^2.0.3",
+    "sequelize": "^4.39.0"
+  },
+  "devDependencies": {
+    "nodemon": "^1.18.4"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "dev": "nodemon index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nvwebd/treehouse-fsjs-project10-build-a-library-manager.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/nvwebd/treehouse-fsjs-project10-build-a-library-manager/issues"
+  },
+  "homepage": "https://github.com/nvwebd/treehouse-fsjs-project10-build-a-library-manager#readme"
+}
