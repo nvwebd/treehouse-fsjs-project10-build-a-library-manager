@@ -1,10 +1,6 @@
-doctype html
-head
-  title Loans
-  link(rel='stylesheet', href='static/stylesheets/index.css')
+extends loans
 
-  include ../includes/navigation
-
+block loans_content
   h1 Loans
   p
     a.button(href='new_loan.html') Create New Loan

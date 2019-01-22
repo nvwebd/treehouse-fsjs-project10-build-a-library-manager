@@ -1,20 +1,6 @@
-doctype html
-html(lang="en")
-  head
-    title=title
-    link(rel='stylesheet', href='static/stylesheets/index.css')
+extends books
 
-  include ../includes/navigation
-
-  p
-    a.button(href='/books/new') Create New Book
-  p
-    | Filters
-    a(href='books') All
-    |  |
-    a(href='books/overdue') Overdue
-    |  |
-    a(href='books/checked') Checked Out
+block book_content
   table
     thead
       tr

@@ -9,19 +9,33 @@ router.use(function timeLog(req, res, next) {
 });
 // define the home page route
 router.get("/", (req, res) => {
-  models.books.findAll().then(allBooks => {
-    console.log('these are all the books: ', allBooks);
-    res.render("pages/books", {
-      title: "Books",
-      data: allBooks,
-      page: "books"
+  models.books
+    .findAll({})
+    .then(allBooks => {
+      console.log("these are all the books: ", allBooks);
+      res.render("pages/books/all_books", {
+        title: "Books",
+        data: allBooks
+      });
+    })
+    .catch(error => {
+      console.error("Error: ", error);
     });
-  });
-  // res.send({title: 'Books', page: 'books'})
 });
-// define the about route
-router.get("/about", (req, res) => {
-  res.send("About birds");
+
+router.get("/overdue", (req, res) => {
+  console.log("Fetching all OVERDUE books!");
+  res.render("pages/books/overdue_books", { title: "Overdue Books" });
+});
+
+router.get("/checked", (req, res) => {
+  console.log("Fetching all CHECKED books!");
+  res.render("pages/books/checked_books", { title: "Checked Books" });
+});
+
+router.get("/new", (req, res) => {
+  console.log("Creating a NEW_BOOK!");
+  res.render("pages/books/new_book", { title: "New Book" });
 });
 
 module.exports = router;

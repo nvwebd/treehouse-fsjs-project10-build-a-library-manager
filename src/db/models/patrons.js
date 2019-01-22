@@ -3,7 +3,10 @@ module.exports = (sequelize, DataTypes) => {
   const patrons = sequelize.define(
     "patrons",
     {
-      id: DataTypes.INTEGER,
+      id: {
+        type: DataTypes.INTEGER,
+        primaryKey: true
+      },
       first_name: DataTypes.STRING,
       last_name: DataTypes.STRING,
       address: DataTypes.STRING,
@@ -11,7 +14,7 @@ module.exports = (sequelize, DataTypes) => {
       library_id: DataTypes.STRING,
       zip_code: DataTypes.INTEGER
     },
-    {}
+    { timestamps: false }
   );
   patrons.associate = function(models) {
     // associations can be defined here

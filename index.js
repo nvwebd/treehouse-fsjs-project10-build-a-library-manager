@@ -13,25 +13,23 @@ app.use("/static", express.static(path.join(__dirname, "src/public")));
 // const routes = require("./src/routes");
 
 // inject routes
+const home = require("./src/routes/home");
 const books = require("./src/routes/books");
 const loans = require("./src/routes/loans");
 const patrons = require("./src/routes/patrons");
 
 // set the app to use these routes
-app.get("/", function(req, res) {
-  res.render("index", { title: "Library Manager" });
-});
-
+app.use("/", home);
 app.use("/books", books);
 app.use("/loans", loans);
 app.use("/patrons", patrons);
 
 // error handling middleware - if this triggers then no route was matched
-app.use((req, res, next) => {
-  const err = new Error("Not Found");
-  err.status = 404;
-  next(err);
-});
+// app.use((req, res, next) => {
+//   const err = new Error("Not Found");
+//   err.status = 404;
+//   next(err);
+// });
 
 // error resolver - writes a console error when route doesnt exist
 // app.use((err, req, res, next) => {
