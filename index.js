@@ -3,14 +3,14 @@ const path = require("path");
 const app = express();
 const normalizePort = require("./src/utils/portNormalizer/index");
 const port = normalizePort.normalizePort(process.env.PORT || "3000");
+const bodyParser = require("body-parser");
 
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "src/views"));
 
 // setting the static route link for static files - all the JS files and images
 app.use("/static", express.static(path.join(__dirname, "src/public")));
-
-// const routes = require("./src/routes");
+app.use(bodyParser.json());
 
 // inject routes
 const home = require("./src/routes/home");

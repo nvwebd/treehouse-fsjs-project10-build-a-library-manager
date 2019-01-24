@@ -9,6 +9,14 @@ block book_content
         th Genre
         th Year Released
     tbody
+      each book in overdueBooks
+        tr
+          td
+            a(href='/books/book_details/' + book.id)=book.title
+          td=book.author
+          td=book.genre
+          td=book.first_published
+
       tr
         td
           a(href='book_detail.html') Harry Potter and the Goblet of Fire

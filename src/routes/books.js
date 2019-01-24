@@ -9,18 +9,40 @@ router.use(function timeLog(req, res, next) {
 });
 // define the home page route
 router.get("/", (req, res) => {
+  const filter = req.params.filter
+    ? { where: { [req.params.filter]: true } }
+    : {};
+
   models.books
     .findAll({})
-    .then(allBooks => {
-      console.log("these are all the books: ", allBooks);
+    .then(allBooks =>
       res.render("pages/books/all_books", {
         title: "Books",
         data: allBooks
-      });
-    })
+      })
+    )
     .catch(error => {
       console.error("Error: ", error);
     });
+});
+
+router.post("/create", (req, res) => {
+  console.log("this is the req.body: ", req.body);
+  models.books.create(req.body).then(instance => {});
+  res.send("creating a new books");
+});
+
+router.get("/book_details/:id", (req, res) => {
+  console.log("checking the params: ", req.params);
+  models.books
+    .findByPk(req.params.id)
+    .then(instance => res.render("pages/books/book_detail", { data: instance }))
+    .catch(error => console.log("Error getting the Book data: ", error));
+});
+
+router.get("/new", (req, res) => {
+  console.log("getting new book page!");
+  res.render("pages/books/new_book");
 });
 
 router.get("/overdue", (req, res) => {
