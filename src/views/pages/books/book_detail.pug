@@ -1,20 +1,29 @@
 extends books
 
 block book_content
-  h1='Book: '+book.title
-  form(action=('/books/edit/'+ book.id) method='post')
+  h1='Book: '+(book.title || prevValues.title)
+  form(action=('/books/book_details/'+ book.id) method='post')
+    //input(type="hidden" value=(loans) name="loansData")
     p
       label(for='title') Title
-      input#title(type='text' value=(book.title) name='title')
+      input#title(type='text' value=(book.title || prevValues.title) name='title')
+      if errors.title
+        em.form-error=errors.title.message
     p
       label(for='author') Author
-      input#author(type='text' value=(book.author) name='author')
+      input#author(type='text' value=(book.author || prevValues.author) name='author')
+      if errors.author
+        em.form-error=errors.author.message
     p
       label(for='genre') Genre
-      input#genre(type='text' value=(book.genre) name='genre')
+      input#genre(type='text' value=(book.genre || prevValues.genre) name='genre')
+      if errors.genre
+        em.form-error=errors.genre.message
     p
       label(for='first_published') First Published
-      input#first_published(type='text' value=(book.first_published) name='first_published')
+      input#first_published(type='text' value=(book.first_published || prevValues.first_published) name='first_published')
+      if errors.first_published
+        em.form-error=errors.first_published.message
     p
       input(type='submit' value='Update')
   h2 Loan History
