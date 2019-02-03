@@ -6,19 +6,22 @@
   "dependencies": {
     "body-parser": "^1.18.3",
     "express": "^4.16.4",
+    "express-validator": "^5.3.1",
+    "helmet": "^3.15.0",
     "pug": "^2.0.3",
     "sequelize": "^4.42.0",
-    "sequelize-cli": "^5.1.0",
+    "sequelize-cli": "^5.4.0",
     "sqlite3": "^4.0.6"
   },
   "devDependencies": {
     "nodemon": "^1.18.9",
-    "prettier": "^1.15.3"
+    "prettier": "^1.16.1"
   },
   "scripts": {
     "start": "node index.js",
-    "dev": "nodemon index.js",
-    "init:db": "./node_modules/.bin/sequelize db:migrate",
+    "dev": "nodemon --ignore node_modules --watch ./",
+    "init:db": "./node_modules/.bin/sequelize db:migrate && ./node_modules/.bin/sequelize db:seed:all",
+    "reinit:db": "./node_modules/.bin/sequelize db:migrate:undo:all && ./node_modules/.bin/sequelize db:migrate && ./node_modules/.bin/sequelize db:seed:all",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {

@@ -7,9 +7,9 @@ block book_content
     | Filters
     a(href='/books')  All
     |  |
-    a(href='/books/overdue')  Overdue
+    a(href='/books/overdue_books')  Overdue
     |  |
-    a(href='/books/checked')  Checked Out
+    a(href='/books/checked_books')  Checked Out
 
   table
     thead
@@ -19,7 +19,7 @@ block book_content
         th Genre
         th Year Released
     tbody
-      each book in data
+      each book in books
         tr
           td
             a(href='/books/book_details/' + book.id)=book.title

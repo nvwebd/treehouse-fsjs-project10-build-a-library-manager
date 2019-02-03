@@ -5,19 +5,65 @@ module.exports = (sequelize, DataTypes) => {
     {
       id: {
         type: DataTypes.INTEGER,
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true,
       },
-      first_name: DataTypes.STRING,
-      last_name: DataTypes.STRING,
-      address: DataTypes.STRING,
-      email: DataTypes.STRING,
-      library_id: DataTypes.STRING,
-      zip_code: DataTypes.INTEGER
+      first_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: true,
+        },
+      },
+      last_name: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: true,
+        },
+      },
+      address: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: true,
+        },
+      },
+      email: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          isEmail: true,
+        },
+      },
+      library_id: {
+        type: DataTypes.STRING,
+        allowNull: false,
+        validate: {
+          notEmpty: true,
+        },
+      },
+      zip_code: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          isInt: true,
+        },
+      },
     },
-    { timestamps: false }
+    {
+      timestamps: false,
+      underscored: true,
+      getterMethods: {
+        fullName() {
+          return `${this.first_name} ${this.last_name}`;
+        }
+      }
+    }
   );
   patrons.associate = function(models) {
     // associations can be defined here
+    models.patrons.hasMany(models.loans);
   };
   return patrons;
 };

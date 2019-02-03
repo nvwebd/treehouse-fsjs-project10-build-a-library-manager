@@ -92,3 +92,14 @@ input {
 input[type=text], select {
     margin-left: 10px;
 }
+
+
+/* CUSTOM STYLING */
+
+.form-error:before {
+    content: '*';
+}
+.form-error {
+    color: red;
+    margin-left: 10px;
+}

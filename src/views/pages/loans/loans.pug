@@ -1,14 +1,4 @@
 extends ../../index
 
-h1 Loans
-p
-  a.button(href='new_loan.html') Create New Loan
-p
-  | Filters
-  a(href='all_loans.html') All
-  |  |
-  a(href='overdue_loans.html') Overdue
-  |  |
-  a(href='checked_loans.html') Checked Out
-
-block loans_content
+block content
+  block loans_content

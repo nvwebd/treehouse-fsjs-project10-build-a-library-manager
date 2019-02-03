@@ -4,13 +4,18 @@ const app = express();
 const normalizePort = require("./src/utils/portNormalizer/index");
 const port = normalizePort.normalizePort(process.env.PORT || "3000");
 const bodyParser = require("body-parser");
+const helmet = require('helmet')
 
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "src/views"));
 
+// securing HTTP Headers
+app.use(helmet());
+
 // setting the static route link for static files - all the JS files and images
 app.use("/static", express.static(path.join(__dirname, "src/public")));
 app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true }));
 
 // inject routes
 const home = require("./src/routes/home");

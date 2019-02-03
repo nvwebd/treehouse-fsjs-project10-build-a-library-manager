@@ -1,20 +1,20 @@
 extends books
 
 block book_content
-  h1='Book: '+data.title
-  form(action='/books/edit/:id' method='post')
+  h1='Book: '+book.title
+  form(action=('/books/edit/'+ book.id) method='post')
     p
       label(for='title') Title
-      input#title(type='text' value=(data.title) name='title')
+      input#title(type='text' value=(book.title) name='title')
     p
       label(for='author') Author
-      input#author(type='text' value=(data.author) name='author')
+      input#author(type='text' value=(book.author) name='author')
     p
       label(for='genre') Genre
-      input#genre(type='text' value=(data.genre) name='genre')
+      input#genre(type='text' value=(book.genre) name='genre')
     p
       label(for='first_published') First Published
-      input#first_published(type='text' value=(data.first_published) name='first_published')
+      input#first_published(type='text' value=(book.first_published) name='first_published')
     p
       input(type='submit' value='Update')
   h2 Loan History
@@ -28,13 +28,15 @@ block book_content
         th Returned on
         th Action
     tbody
-      tr
-        td
-          a(href='book_detail.html') A Brief History of Time
-        td
-          a(href='patron_detail.html') Andrew Chalkley
-        td 2015-12-12
-        td 2015-12-19
-        td
-        td
-          a.button(href='return_book.html') Return Book
+      each loan in loans
+        tr
+          td
+            a(href='/books/book_details/'+book.id)=book.title
+          td
+            a(href='/patrons/patron_details/'+loan.patron_id)=(loan.patron.first_name + ' ' + loan.patron.last_name)
+          td=loan.loaned_on
+          td=loan.return_by
+          td=loan.returned_on
+          td
+            if !loan.returned_on
+              a.button(href='/books/return_book') Return Book

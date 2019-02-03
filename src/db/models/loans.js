@@ -5,18 +5,59 @@ module.exports = (sequelize, DataTypes) => {
     {
       id: {
         type: DataTypes.INTEGER,
-        primaryKey: true
+        primaryKey: true,
+        autoIncrement: true
       },
-      book_id: DataTypes.INTEGER,
-      patron_id: DataTypes.INTEGER,
-      loaned_on: DataTypes.DATE,
-      return_by: DataTypes.DATE,
-      returned_on: DataTypes.DATE
+      book_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          isInt: true
+        }
+      },
+      patron_id: {
+        type: DataTypes.INTEGER,
+        allowNull: false,
+        validate: {
+          isInt: true
+        }
+      },
+      loaned_on: {
+        type: DataTypes.DATEONLY,
+        allowNull: false,
+        validations: {
+          isDate: true
+        }
+      },
+      return_by: {
+        type: DataTypes.DATEONLY,
+        allowNull: false,
+        validations: {
+          isDate: true
+        }
+      },
+      returned_on: {
+        type: DataTypes.DATEONLY,
+        allowNull: true,
+        validations: {
+          isDate: true
+        }
+      }
     },
-    { timestamps: false }
+    { timestamps: false, underscored: true }
   );
-  loans.associate = function(models) {
+  loans.associate = models => {
     // associations can be defined here
+    loans.belongsTo(models.books, {
+      foreignKey: {
+        allowNull: false
+      }
+    });
+    loans.belongsTo(models.patrons, {
+      foreignKey: {
+        allowNull: false
+      }
+    });
   };
   return loans;
 };
