@@ -4,6 +4,7 @@ const models = require("./../db/models");
 const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 
+// TODO: extract to a util module
 const formErrorCreator = errorArray => {
   const errors = {};
 
@@ -14,14 +15,18 @@ const formErrorCreator = errorArray => {
   return errors;
 };
 
+// TODO: extract to an util file
 const dateFormater = () => {
   const nowDate = new Date();
+
   const day =
     nowDate.getDate() < 10 ? `0${nowDate.getDate()}` : `${nowDate.getDate()}`;
+
   const month =
     nowDate.getMonth() < 10
-      ? `0${nowDate.getMonth()}`
-      : `${nowDate.getMonth()}`;
+      ? `0${nowDate.getMonth()+1}`
+      : `${nowDate.getMonth()+1}`;
+
   const year = `${nowDate.getFullYear()}`;
 
   return `${year}-${month}-${day}`;
@@ -46,6 +51,43 @@ router.get("/return_book", (req, res) => {
   res.render("pages/books/return_book", { title: "Return Book" });
 });
 
+router.post("/book_details/:id", (req, res) => {
+  const formData =
+    req.body.first_published === ""
+      ? { ...req.body, first_published: null }
+      : { ...req.body, first_published: parseInt(req.body.first_published) };
+
+  models.books.findByPk(req.params.id).then(instance => {
+    const book = {
+      id: instance.dataValues.id,
+      title: instance.dataValues.title
+    };
+
+    const prevValues = { ...req.body, title: instance.dataValues.title };
+
+    instance
+      .update(formData)
+      .then(() => res.redirect("/books"))
+      .catch(async error => {
+        res.render("pages/books/book_detail", {
+          title: "Book Details",
+          book,
+          prevValues,
+          errors: formErrorCreator(error),
+          loans: await models.loans.findAll({
+            where: { book_id: req.params.id },
+            include: [
+              {
+                model: models.patrons,
+                attributes: ["id", "first_name", "last_name"]
+              }
+            ]
+          })
+        });
+      });
+  });
+});
+
 router.get("/book_details/:id", async (req, res) => {
   const id = req.params.id;
   const book = await models.books.findByPk(id);
@@ -56,10 +98,13 @@ router.get("/book_details/:id", async (req, res) => {
     ]
   });
 
-  res.render("pages/books/book_detail", { title: "Book Details", book, loans });
+  res.render("pages/books/book_detail", {
+    title: "Book Details",
+    errors: {},
+    book,
+    loans
+  });
 });
-
-router.put("/edit")
 
 router.get("/new", (req, res) => {
   res.render("pages/books/new_book", {
@@ -73,7 +118,7 @@ router.post("/new", (req, res) => {
   const newBookData =
     req.body.first_published === ""
       ? { ...req.body, first_published: null }
-      : req.body;
+      : { ...req.body, first_published: parseInt(req.body.first_published) };
 
   models.books
     .create(req.body)
