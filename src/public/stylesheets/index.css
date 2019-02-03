@@ -97,7 +97,7 @@ input[type=text], select {
 /* CUSTOM STYLING */
 
 .form-error:before {
-    content: '*';
+    content: '* ';
 }
 .form-error {
     color: red;

@@ -1,3 +1,9 @@
+// TODO: expansion of the Project
+/**
+ * - check book ids before creating new loan - can't load the same book to two patrons at the same time
+ *
+ */
+
 const express = require("express");
 const path = require("path");
 const app = express();
