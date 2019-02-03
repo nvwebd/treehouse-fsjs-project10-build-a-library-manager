@@ -38,7 +38,10 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: true,
         validate: {
-          isYearCompliant: function(inputYear) {
+          isInt: {
+            msg: "First"
+          },
+          isYearCompliant: (inputYear) => {
             const currentYear = new Date().getFullYear();
             if (inputYear > currentYear) {
               throw new Error("First Published Year must be in the past!");

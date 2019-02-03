@@ -12,28 +12,42 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.INTEGER,
         allowNull: false,
         validate: {
-          isInt: true
+          isInt: {
+            msg: "This field is required!"
+          }
         }
       },
       patron_id: {
         type: DataTypes.INTEGER,
         allowNull: false,
         validate: {
-          isInt: true
+          isInt: {
+            msg: "This field is required!"
+          }
         }
       },
       loaned_on: {
         type: DataTypes.DATEONLY,
         allowNull: false,
         validations: {
-          isDate: true
+          notNull: {
+            msg: "This field is required!"
+          },
+          isDate: {
+            msg: "Sorry Date format is incorrect - use YYYY-MM-DD"
+          }
         }
       },
       return_by: {
         type: DataTypes.DATEONLY,
         allowNull: false,
         validations: {
-          isDate: true
+          isDate: {
+            msg: "Sorry Date format is incorrect - use YYYY-MM-DD"
+          },
+          notNull: {
+            msg: "This field is required!"
+          }
         }
       },
       returned_on: {
