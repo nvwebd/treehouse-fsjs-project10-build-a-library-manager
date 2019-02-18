@@ -5,12 +5,12 @@ block loans_content
   p
     a.button(href='/loans/new') Create New Loan
   p
-    | Filters
-    a(href='/loans')  All
+    | Filters:
+    a(href='/loans' class={active: activeTab === 'all'})  All
     |  |
-    a(href='/loans/overdue_loans')  Overdue
+    a(href='/loans/overdue_loans' class={active: activeTab === 'overdue'})  Overdue
     |  |
-    a(href='/loans/checked_loans')  Checked Out
+    a(href='/loans/checked_loans' class={active: activeTab === 'checked'})  Checked Out
   table
     thead
       tr
@@ -26,10 +26,10 @@ block loans_content
            td
              a(href='/books/book_details/'+loan.book_id)=loan.book.title
            td
-             a(href='/patrons/patron_detail/'+loan.patron_id)=(loan.patron.first_name+ " "+loan.patron.last_name)
+             a(href='/patrons/patron_details/'+loan.patron_id)=(loan.patron.first_name+ " "+loan.patron.last_name)
            td=loan.loaned_on
            td=loan.return_by
            td=loan.returned_on
            td
              if !loan.returned_on
-               a.button(href='/books/return_book/:id') Return Book
+               a.button(href='/loans/return_book/'+loan.book_id) Return Book
