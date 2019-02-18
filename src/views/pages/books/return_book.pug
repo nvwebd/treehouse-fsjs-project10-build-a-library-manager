@@ -1,22 +1,24 @@
 extends books
 
 block book_content
-  h1 Patron: Return Book
+  h1 Return Book
   p
     strong Book Title:
-    |  Harry Potter and the Goblet of Fire
+    |  !{loan.book.title}
   p
     strong Loaned By:
-    |  Andrew Chalkley
+    |   !{loan.patron.first_name + " " + loan.patron.last_name}
   p
     strong Loaned On:
-    |  2015-12-11
+    |   !{loan.loaned_on}
   p
     strong Return By:
-    |  2015-12-18
-  form
+    |   !{loan.return_by}
+  form(action="/loans/return_book/"+loan.id method="post")
     p
       label(for='returned_on') Returned on:
-      input#returned_on(type='text' value='2020-10-10')
+      input#returned_on(type='text' value=returned_on || prevValues.returned_on name="returned_on")
+      if errors.returned_on
+        em.form-error=errors.returned_on.message
     p
       input(type='submit' value='Return Book')
