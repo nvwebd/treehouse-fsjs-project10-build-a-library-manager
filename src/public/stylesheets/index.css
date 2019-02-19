@@ -55,6 +55,7 @@ h2 {
     border-top: 2px solid #e7e7e7;
     padding-top: 20px;
 }
+
 th {
     border-bottom: 2px solid #D8B493;
     text-align: left;
@@ -96,10 +97,31 @@ input[type=text], select {
 
 /* CUSTOM STYLING */
 
+table {
+    width: 100%;
+}
+
 .form-error:before {
     content: '* ';
 }
 .form-error {
     color: red;
     margin-left: 10px;
+}
+
+.active{
+    color: darkred;
+}
+
+/* PAGINATION */
+
+.pagination {
+    border: 1px solid black;
+    text-align: center;
+    margin: 20px auto;
+}
+
+.current {
+    color: darkred;
+    font-size: 1.25em;
 }
