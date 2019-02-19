@@ -5,11 +5,12 @@ block book_content
     a.button(href='/books/new') Create New Book
   p
     | Filters
-    a(href='/books')  All
+    a(href='/books' class={active: activeTab === 'all'})  All
     |  |
-    a(href='/books/overdue_books')  Overdue
+    a(href='/books/overdue_books' class={active: activeTab === 'overdue'})  Overdue
     |  |
-    a(href='/books/checked_books')  Checked Out
+    a(href='/books/checked_books' class={active: activeTab === 'checked'})  Checked Out
+
   table
     thead
       tr
@@ -25,3 +26,5 @@ block book_content
           td=checked.book.author
           td=checked.book.genre
           td=checked.book.first_published
+
+  include ../../includes/pagination
