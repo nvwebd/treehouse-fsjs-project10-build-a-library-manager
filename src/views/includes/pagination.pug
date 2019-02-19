@@ -1,0 +1,10 @@
+- var page = 1;
+
+nav(class='pagination')
+  ul
+    while page <= pagination.pages
+      li
+        if pagination.currentPage === page
+          a.current(href=`/${pagination.type}?page=${page}`)= page++
+        else
+          a(href=`/${pagination.type}?page=${page}`)= page++
