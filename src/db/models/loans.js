@@ -14,6 +14,9 @@ module.exports = (sequelize, DataTypes) => {
         validate: {
           isInt: {
             msg: "This field is required!"
+          },
+          notEmpty: {
+            msg: "This field is required!"
           }
         }
       },
@@ -23,6 +26,9 @@ module.exports = (sequelize, DataTypes) => {
         validate: {
           isInt: {
             msg: "This field is required!"
+          },
+          notEmpty: {
+            msg: "This field is required!"
           }
         }
       },
@@ -30,11 +36,11 @@ module.exports = (sequelize, DataTypes) => {
         type: DataTypes.DATEONLY,
         allowNull: false,
         validations: {
-          notNull: {
+          notEmpty: {
             msg: "This field is required!"
           },
           isDate: {
-            msg: "Sorry Date format is incorrect - use YYYY-MM-DD"
+            msg: "Please provide date in YYYY-MM-DD format."
           }
         }
       },
@@ -43,18 +49,48 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         validations: {
           isDate: {
-            msg: "Sorry Date format is incorrect - use YYYY-MM-DD"
+            msg: "Please provide date in YYYY-MM-DD format."
           },
-          notNull: {
+          notEmpty: {
             msg: "This field is required!"
+          },
+          isNotInvalidDateString(value) {
+            console.log("THIS IS THE isNotInvalidDateString value: ", value);
+            if(value === "Invalid date") {
+              throw new Error('Invalid Date, try again!')
+            }
+
+            if(this.return_by === "Invalid date") {
+              throw new Error('Invalid Date, try again!')
+            }
           }
         }
       },
       returned_on: {
         type: DataTypes.DATEONLY,
         allowNull: true,
+        defaultValue: null,
         validations: {
-          isDate: true
+          len: {
+            args: [1, 10],
+            msg: "Please provide a return date!"
+          },
+          notEmpty: {
+            msg: "Please provide a return date!"
+          },
+          isDate: {
+            msg: "Please provide date in YYYY-MM-DD format."
+          },
+          isNotInvalidDateString(value) {
+            console.log("THIS IS THE isNotInvalidDateString value: ", value);
+            if(value === "Invalid date") {
+              throw new Error('Invalid Date, try again!')
+            }
+
+            if(this.return_by === "Invalid date") {
+              throw new Error('Invalid Date, try again!')
+            }
+          }
         }
       }
     },
