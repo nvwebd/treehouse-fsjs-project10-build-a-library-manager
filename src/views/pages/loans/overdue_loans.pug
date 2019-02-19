@@ -1,16 +1,16 @@
 extends loans
 
 block loans_content
-  h1 Overdue Loans
+  h1=title
   p
     a.button(href='new_loan.html') Create New Loan
   p
-    | Filters
-    a(href='all_loans.html') All
+    | Filters:
+    a(href='/loans' class={active: activeTab === 'all'})  All
     |  |
-    a(href='overdue_loans.html') Overdue
+    a(href='/loans/overdue_loans' class={active: activeTab === 'overdue'})  Overdue
     |  |
-    a(href='checked_loans.html') Checked Out
+    a(href='/loans/checked_loans' class={active: activeTab === 'checked'})  Checked Out
   table
     thead
       tr
@@ -21,34 +21,16 @@ block loans_content
         th Returned on
         th Action
     tbody
-      tr
-        td
-          a(href='book_detail.html') Harry Potter and the Goblet of Fire
-        td
-          a(href='patron_detail.html') Andrew Chalkley
-        td 2015-12-11
-        td 2015-12-18
-        td
-        td
-          a.button(href='return_book.html') Return Book
-      tr
-        td
-          a(href='book_detail.html') A Brief History of Time
-        td
-          a(href='patron_detail.html') Andrew Chalkley
-        td 2015-12-12
-        td 2015-12-19
-        td
-        td
-          a.button(href='return_book.html') Return Book
-      tr
-        td
-          a(href='book_detail.html') The Universe in a Nutshell
-        td
-          a(href='patron_detail.html') Alena Holligan
-        td 2015-12-13
-        td 2015-12-20
-        td
-        td
-          a.button(href='return_book.html') Return Book
+      each loan in loans
+        tr
+          td
+            a(href='/books/book_details/' + loan.book_id)=loan.book.title
+          td
+            a(href='/patrons/patron_details/' + loan.patron_id)=(loan.patron.first_name + " " + loan.patron.last_name)
+          td=loan.loaned_on
+          td=loan.return_by
+          td=loan.returned_on
+          td
+            if !loan.returned_on
+              a.button(href='/loans/return_book/' + loan.book_id) Return Book
   
