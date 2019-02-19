@@ -6,64 +6,73 @@ module.exports = (sequelize, DataTypes) => {
       id: {
         type: DataTypes.INTEGER,
         primaryKey: true,
-        autoIncrement: true,
+        autoIncrement: true
       },
       first_name: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          notEmpty: true,
-        },
+          notEmpty: {
+            msg: "This field is required!"
+          }
+        }
       },
       last_name: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          notEmpty: true,
-        },
+          notEmpty: {
+            msg: "This field is required!"
+          }
+        }
       },
       address: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          notEmpty: true,
-        },
+          notEmpty: {
+            msg: "This field is required!"
+          }
+        }
       },
       email: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          isEmail: true,
-        },
+          isEmail: {
+            msg: "Please input a email - example@example.com"
+          }
+        }
       },
       library_id: {
         type: DataTypes.STRING,
         allowNull: false,
         validate: {
-          notEmpty: true,
-        },
+          notEmpty: {
+            msg: "This field is required!"
+          }
+        }
       },
       zip_code: {
         type: DataTypes.INTEGER,
         allowNull: false,
         validate: {
-          isInt: true,
-        },
-      },
+          isInt: {
+            msg: "Only numbers are allowed for this field!"
+          },
+          notEmpty: {
+            msg: "This field is required!"
+          }
+        }
+      }
     },
     {
       timestamps: false,
-      underscored: true,
-      getterMethods: {
-        fullName() {
-          return `${this.first_name} ${this.last_name}`;
-        }
-      }
+      underscored: true
     }
   );
-  patrons.associate = function(models) {
-    // associations can be defined here
-    models.patrons.hasMany(models.loans);
+  patrons.associate = models => {
+    patrons.hasMany(models.loans);
   };
   return patrons;
 };
