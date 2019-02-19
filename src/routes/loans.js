@@ -1,124 +1,176 @@
 const express = require("express");
 const router = express.Router();
 const models = require("./../db/models");
-
-// TODO: extract to a util module
-// TODO: create a promise based function - returns promise
-const formErrorCreator = errorArray => {
-  const errors = {};
-
-  errorArray.errors.map(
-    error => (errors[error.path] = { message: error.message })
-  );
-
-  return errors;
-};
-
-// TODO: extract to an util file
-const dateFormater = () => {
-  const nowDate = new Date();
-
-  const day =
-    nowDate.getDate() < 10 ? `0${nowDate.getDate()}` : `${nowDate.getDate()}`;
-
-  const month =
-    nowDate.getMonth() < 10
-      ? `0${nowDate.getMonth() + 1}`
-      : `${nowDate.getMonth() + 1}`;
-
-  const year = `${nowDate.getFullYear()}`;
-
-  return `${year}-${month}-${day}`;
-};
+const sequelize = require("sequelize");
+const Op = sequelize.Op;
+const formErrorCreator = require("./../utils/formErrorFormatter");
+const dateFormater = require("./../utils/dateFormater");
 
 // define the home page route
 router.get("/", (req, res) => {
-  const filter = req.params.filter
-    ? { where: { [req.params.filter]: true } }
-    : {};
-
   models.loans
     .findAll({
-      include: [
-        {
-          model: models.books,
-          attributes: ["id", "title"]
-        },
-        {
-          model: models.patrons,
-          attributes: ["id", "first_name", "last_name"]
-        }
-      ]
+      model: models.loans,
+      include: [{ model: models.books }, { model: models.patrons }]
     })
     .then(loans => {
       res.render("pages/loans/all_loans", {
         title: "Loans",
+        activeTab: "all",
         loans
       });
     })
     .catch(error => console.log(error));
 });
 
-router.get("/new", async (req, res) => {
-  const books = await models.books.findAll({ attributes: ["id", "title"] });
-  const patrons = await models.patrons.findAll({
-    attributes: ["id", "first_name", "last_name"]
+router
+  .route("/new")
+  .get(async (req, res) => {
+    const books = await models.books.findAll({ attributes: ["id", "title"] });
+    const patrons = await models.patrons.findAll({
+      attributes: ["id", "first_name", "last_name"]
+    });
+
+    const loanedOnValue = dateFormater();
+    const returnByValue = dateFormater(7);
+
+    res.render("pages/loans/new_loan", {
+      title: "New Loan",
+      errors: {},
+      prevValues: {},
+      books,
+      patrons,
+      loanedOnValue,
+      returnByValue
+    });
+  })
+  .post((req, res) => {
+    console.log('req.body: ', req.body);
+    models.loans
+      .create(req.body)
+      .then(() => {
+        res.redirect("/loans");
+      })
+      .catch(async error => {
+        const errors = formErrorCreator(error);
+        console.log('ERRORS => ', errors);
+        const books = await models.books.findAll({
+          attributes: ["id", "title"]
+        });
+        const patrons = await models.patrons.findAll({
+          attributes: ["id", "first_name", "last_name"]
+        });
+
+        const prevValues = {
+          ...req.body,
+          book_id: parseInt(req.body.book_id),
+          patron_id: parseInt(req.body.patron_id)
+        };
+
+        res.render("pages/loans/new_loan", {
+          title: "New Loan",
+          errors,
+          prevValues,
+          books,
+          patrons
+        });
+      });
   });
 
-  const loanedOnValue = dateFormater();
-  const returnByValue = "test";
+router
+  .route("/return_book/:id")
+  .get(async (req, res) => {
+    const bookId = req.params.id;
+    const loan = await models.loans.findOne({
+      where: { book_id: bookId },
+      include: [
+        {
+          model: models.books,
+          attributes: ["title"]
+        },
+        { model: models.patrons, attributes: ["first_name", "last_name"] }
+      ]
+    });
 
-  res.render("pages/loans/new_loan", {
-    title: "New Loan",
-    errors: {},
-    prevValues: {},
-    books,
-    patrons,
-    loanedOnValue,
-    returnByValue
+    res.render("pages/books/return_book", {
+      title: "Return Book",
+      errors: {},
+      loan,
+      returned_on: dateFormater()
+    });
+  })
+  .post(async (req, res) => {
+    const formData = req.body;
+
+    models.loans.findByPk(req.params.id).then(instance => {
+      instance
+        .update(formData)
+        .then(() => {
+          res.redirect("/loans");
+        })
+        .catch(error => {
+          res.render("pages/loans/all_loans", {
+            title: "Return Book",
+            errors: formErrorCreator(error)
+          });
+        });
+    });
   });
-});
 
-// TODO: sort the Invalid Date problem and true date parsing
-router.post("/new", (req, res) => {
-  const createData = {
-    ...req.body,
-    loaned_on: req.body.loaned_on === "" ? null : req.body.loaned_on,
-    return_by: req.body.return_by === "" ? null : req.body.return_by
-  };
-
+router.get("/overdue_loans", (req, res) => {
   models.loans
-    .create(createData)
-    .then(() => {
-      res.redirect("/loans");
+    .findAll({
+      model: models.loans,
+      where: {
+        [Op.and]: {
+          return_by: {
+            [Op.lt]: dateFormater()
+          },
+          returned_on: {
+            [Op.eq]: null
+          }
+        }
+      },
+      include: [{ model: models.books }, { model: models.patrons }]
     })
-    .catch(async error => {
-      const errors = formErrorCreator(error);
-      const books = await models.books.findAll({ attributes: ["id", "title"] });
-      const patrons = await models.patrons.findAll({
-        attributes: ["id", "first_name", "last_name"]
+    .then(loans => {
+      res.render("pages/loans/overdue_loans", {
+        title: "Overdue Loans",
+        activeTab: "overdue",
+        loans
       });
-
-      const prevValues = {
-        ...createData,
-        book_id: parseInt(createData.book_id),
-        preton_id: parseInt(createData.patron_id)
-      };
-
-      console.log(prevValues);
-
-      res.render("pages/loans/new_loan", {
-        title: "New Loan",
-        errors,
-        prevValues,
-        books,
-        patrons
-      });
+    })
+    .catch(error => {
+      console.log("ERROR fetching all overdue books: ", error);
     });
 });
 
-router.get("/overdue_loans", (req, res) => {});
-
-router.get("/checked_loans", (req, res) => {});
+router.get("/checked_loans", (req, res) => {
+  models.loans
+    .findAll({
+      model: models.loans,
+      where: {
+        [Op.and]: {
+          loaned_on: {
+            [Op.not]: null
+          },
+          returned_on: {
+            [Op.eq]: null
+          }
+        }
+      },
+      include: [{ model: models.books }, { model: models.patrons }]
+    })
+    .then(loans => {
+      res.render("pages/loans/checked_loans", {
+        title: "Checked Loans",
+        activeTab: "checked",
+        loans
+      });
+    })
+    .catch(error => {
+      console.log("ERROR getting checked books: ", error);
+    });
+});
 
 module.exports = router;
