@@ -7,7 +7,7 @@
 const express = require("express");
 const path = require("path");
 const app = express();
-const normalizePort = require("./src/utils/portNormalizer/index");
+const normalizePort = require("./src/utils/portNormalizer");
 const port = normalizePort.normalizePort(process.env.PORT || "3000");
 const helmet = require('helmet');
 
@@ -37,23 +37,6 @@ app.use("/", home);
 app.use("/books", books);
 app.use("/loans", loans);
 app.use("/patrons", patrons);
-
-// error handling middleware - if this triggers then no route was matched
-// app.use((req, res, next) => {
-//   const err = new Error("Not Found");
-//   err.status = 404;
-//   next(err);
-// });
-
-// error resolver - writes a console error when route doesnt exist
-// app.use((err, req, res, next) => {
-//   res.locals.error = err;
-//   res.status(err.status);
-//   console.error("There's been an error getting the resource: ", err.message);
-//   console.error("Status Code: ", err.status);
-//   console.error("Stack Trace: ", err.stack);
-//   res.render("error", err);
-// });
 
 // starting the server and listening on port 3000
 app.listen(port, () =>
