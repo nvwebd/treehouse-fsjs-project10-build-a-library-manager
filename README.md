@@ -22,4 +22,5 @@
 
 ### TODO:
 
+- [ ] Write comments :)
 - [ ] Optimize searchBuilder module - convert to a query builder which builds the whole query based on type and search input
