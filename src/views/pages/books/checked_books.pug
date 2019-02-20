@@ -11,6 +11,8 @@ block book_content
     |  |
     a(href='/books/checked_books' class={active: activeTab === 'checked'})  Checked Out
 
+  include ../../includes/search
+
   table
     thead
       tr
@@ -27,4 +29,7 @@ block book_content
           td=checked.book.genre
           td=checked.book.first_published
 
-  include ../../includes/pagination
+  if count !== 10
+    include ../../includes/pagination
+  else
+    include ../../includes/notFound
