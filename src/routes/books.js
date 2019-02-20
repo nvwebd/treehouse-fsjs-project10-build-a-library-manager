@@ -6,9 +6,12 @@ const Op = Sequelize.Op;
 const formErrorCreator = require("./../utils/formErrorFormatter");
 const dateFormater = require("./../utils/dateFormater");
 const pagination = require("./../utils/pagination");
+const searchBuilder = require("./../utils/searchBuilder");
 
 // define the home page route - show all books with filtering and pagination
 router.get("/", (req, res) => {
+  const search = req.query.search || "";
+
   const query = {
     limit: 10,
     offset: req.query.page ? req.query.page * 10 : null
@@ -18,18 +21,30 @@ router.get("/", (req, res) => {
     query.offset = req.query.page * query.limit;
   }
 
+  if (req.query.search) {
+    query.where = {
+      [Op.or]: searchBuilder({
+        searchType: "books",
+        search
+      })
+    };
+  }
+
   models.books
     .findAndCountAll(query)
     .then(books => {
       res.render("pages/books/all_books", {
         title: "Books",
+        count: books.count,
         pagination: pagination({
           page: req.query.page || 1,
           paginationType: "books",
           rowCount: books.count
         }),
         books: books.rows,
-        activeTab: "all"
+        activeTab: "all",
+        searchType: "/books",
+        search
       });
     })
     .catch(error => {
@@ -117,43 +132,48 @@ router
   });
 
 router.get("/overdue_books", (req, res) => {
-  const query = {
-    limit: 10,
-    offset: req.query.page ? req.query.page * 10 : null
+  const search = req.query.search || "";
+
+  let query = {
+    model: models.loans,
+    attributes: ["book_id", "patron_id"],
+    where: {
+      [Op.and]: {
+        return_by: {
+          [Op.lt]: dateFormater()
+        },
+        returned_on: {
+          [Op.eq]: null
+        }
+      }
+    },
+    include: [
+      {
+        model: models.books,
+        where: req.query.search
+          ? { [Op.or]: searchBuilder({ searchType: "books", search }) }
+          : null
+      }
+    ],
+    offset: req.query.page * 10 || null,
+    limit: 10
   };
 
-  if (req.query.length !== 0 && req.query.page) {
-    query.offset = req.query.page * query.limit;
-  }
-
   models.loans
-    .findAndCountAll({
-      model: models.loans,
-      attributes: ["book_id", "patron_id"],
-      where: {
-        [Op.and]: {
-          return_by: {
-            [Op.lt]: dateFormater()
-          },
-          returned_on: {
-            [Op.eq]: null
-          }
-        }
-      },
-      include: [{ model: models.books }],
-      offset: req.query.page * 10 || null,
-      limit: 10
-    })
+    .findAndCountAll(query)
     .then(loans => {
       res.render("pages/books/overdue_books", {
         title: "Overdue Books",
         activeTab: "overdue",
+        count: loans.count,
         loans: loans.rows,
         pagination: pagination({
           page: req.query.page || 1,
           paginationType: "books/overdue_books",
           rowCount: loans.count
         }),
+        searchType: "/books/overdue_books",
+        search
       });
     })
     .catch(error => {
@@ -162,6 +182,8 @@ router.get("/overdue_books", (req, res) => {
 });
 
 router.get("/checked_books", (req, res) => {
+  const search = req.query.search || "";
+
   models.loans
     .findAndCountAll({
       model: models.loans,
@@ -175,7 +197,14 @@ router.get("/checked_books", (req, res) => {
           }
         }
       },
-      include: [{ model: models.books }],
+      include: [
+        {
+          model: models.books,
+          where: req.query.search
+            ? { [Op.or]: searchBuilder({ searchType: "books", search }) }
+            : null
+        }
+      ],
       offset: req.query.page * 10 || null,
       limit: 10
     })
@@ -183,12 +212,14 @@ router.get("/checked_books", (req, res) => {
       res.render("pages/books/checked_books", {
         title: "Checked Books",
         activeTab: "checked",
+        count: checkedBooks.count,
         checkedBooks: checkedBooks.rows,
         pagination: pagination({
           page: req.query.page || 1,
           paginationType: "books/checked_books",
           rowCount: checkedBooks.count
         }),
+        searchType: "/books/checked_books"
       });
     })
     .catch(error => {
