@@ -9,19 +9,6 @@
     - run: `npm run reinit:db:seed` to create the DB tables and seed the sample data to it
     
 ---
-
-- !!! TODO !!!
-    - [x]   Create NEW Forms - LABEL click sets focus to the input field
-    - [x]   Maximize async / await usage
-    - [x]   Create util modules: errorFormatter, dateFormatter
-    - [x]   Move return book to loans route
-    - [x]   Check all Page titles
-    
-    - [x]   Checked Loans
-    - [x]   Overdue Loans
-    - [x]   Overdue Books
-    - [x]   Checked Books
-    - [x]   ! Combine routes with router.route
     
 ## TODO & Open Issues:
 
