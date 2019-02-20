@@ -2,6 +2,9 @@
 
 nav(class='pagination')
   ul
+    if pagination.pages === 0
+      li
+        a.current(href=`/${pagination.type}?page=${page}`)= page++
     while page <= pagination.pages
       li
         if pagination.currentPage === page
