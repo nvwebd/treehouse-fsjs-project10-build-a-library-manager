@@ -1,7 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const models = require("./../db/models");
+const Sequelize = require("sequelize");
+const Op = Sequelize.Op;
 const pagination = require("./../utils/pagination");
+const searchBuilder = require("./../utils/searchBuilder");
 
 const formErrorCreator = errorArray => {
   const errors = {};
@@ -15,19 +18,27 @@ const formErrorCreator = errorArray => {
 
 // define the home page route
 router.get("/", async (req, res) => {
+  const search = req.query.search || "";
+
   const patrons = await models.patrons.findAndCountAll({
     offset: req.query.page * 10 || null,
-    limit: 10
+    limit: 10,
+    where: req.query.search
+      ? { [Op.or]: searchBuilder({ searchType: "patrons", search }) }
+      : null
   });
 
   res.render("pages/patrons/all_patrons", {
     title: "Patrons",
+    count: patrons.count,
     pagination: pagination({
       page: req.query.page || 1,
       paginationType: "patrons",
       rowCount: patrons.count
     }),
-    patrons: patrons.rows
+    patrons: patrons.rows,
+    searchType: "/patrons",
+    search
   });
 });
 
@@ -69,28 +80,29 @@ router
     });
   });
 
-router.route("/new")
-.get(async (req, res) => {
-  res.render("pages/patrons/new_patron", {
-    prevValues: {},
-    errors: {},
-    title: "New Patron"
-  });
-})
-.post(async (req, res) => {
-  models.patrons
-  .create(req.body)
-  .then(() => {
-    res.redirect("/patrons");
-  })
-  .catch(error => {
-    const prevValues = req.body;
+router
+  .route("/new")
+  .get(async (req, res) => {
     res.render("pages/patrons/new_patron", {
-      title: "New Patron",
-      prevValues,
-      errors: formErrorCreator(error)
+      prevValues: {},
+      errors: {},
+      title: "New Patron"
     });
+  })
+  .post(async (req, res) => {
+    models.patrons
+      .create(req.body)
+      .then(() => {
+        res.redirect("/patrons");
+      })
+      .catch(error => {
+        const prevValues = req.body;
+        res.render("pages/patrons/new_patron", {
+          title: "New Patron",
+          prevValues,
+          errors: formErrorCreator(error)
+        });
+      });
   });
-});
 
 module.exports = router;
