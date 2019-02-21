@@ -19,9 +19,12 @@
   "scripts": {
     "start": "node index.js",
     "dev": "nodemon --ignore node_modules --watch ./",
-    "init:db": "./node_modules/.bin/sequelize db:migrate && ./node_modules/.bin/sequelize db:seed:all",
-    "reinit:db:seed": "./node_modules/.bin/sequelize db:migrate:undo:all && ./node_modules/.bin/sequelize db:migrate && ./node_modules/.bin/sequelize db:seed:all",
-    "reinit:db": "./node_modules/.bin/sequelize db:migrate:undo:all && ./node_modules/.bin/sequelize db:migrate",
+    "unix:init:db": "./node_modules/.bin/sequelize db:migrate && ./node_modules/.bin/sequelize db:seed:all",
+    "win:init:db": ".\\node_modules\\.bin\\sequelize db:migrate && .\\node_modules\\.bin\\sequelize db:seed:all",
+    "unix:reinit:db:seed": "./node_modules/.bin/sequelize db:migrate:undo:all && ./node_modules/.bin/sequelize db:migrate && ./node_modules/.bin/sequelize db:seed:all",
+    "win:reinit:db:seed": ".\\node_modules\\.bin\\sequelize db:migrate:undo:all && .\\node_modules\\.bin\\sequelize db:migrate && .\\node_modules\\.bin\\sequelize db:seed:all",
+    "unix:reinit:db": ".\\node_modules\\.bin\\sequelize db:migrate:undo:all && .\\node_modules\\.bin\\sequelize db:migrate",
+    "win:reinit:db": ".\\node_modules\\.bin\\sequelize db:migrate:undo:all && .\\node_modules\\.bin\\sequelize db:migrate",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
