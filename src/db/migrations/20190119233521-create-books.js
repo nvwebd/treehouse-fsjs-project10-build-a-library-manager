@@ -22,7 +22,7 @@ module.exports = {
       }
     });
   },
-  down: (queryInterface, Sequelize) => {
-    return queryInterface.dropTable("books");
+  down: (queryInterface) => {
+    return queryInterface.dropTable("books", {});
   }
 };

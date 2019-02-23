@@ -26,6 +26,6 @@ module.exports = {
     });
   },
   down: (queryInterface) => {
-    return queryInterface.dropTable("loans");
+    return queryInterface.dropTable("loans", {});
   }
 };
