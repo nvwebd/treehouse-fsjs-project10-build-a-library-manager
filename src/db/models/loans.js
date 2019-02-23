@@ -35,9 +35,13 @@ module.exports = (sequelize, DataTypes) => {
       loaned_on: {
         type: DataTypes.DATEONLY,
         allowNull: false,
-        validations: {
+        validate: {
           notEmpty: {
             msg: "This field is required!"
+          },
+          notContains: {
+            args: ["Invalid date"],
+            msg: "Please provide date in YYYY-MM-DD format."
           },
           isDate: {
             msg: "Please provide date in YYYY-MM-DD format."
@@ -47,50 +51,30 @@ module.exports = (sequelize, DataTypes) => {
       return_by: {
         type: DataTypes.DATEONLY,
         allowNull: false,
-        validations: {
-          isDate: {
+        validate: {
+          notContains: {
+            args: ["Invalid date"],
             msg: "Please provide date in YYYY-MM-DD format."
           },
-          notEmpty: {
-            msg: "This field is required!"
-          },
-          isNotInvalidDateString(value) {
-            console.log("THIS IS THE isNotInvalidDateString value: ", value);
-            if(value === "Invalid date") {
-              throw new Error('Invalid Date, try again!')
-            }
-
-            if(this.return_by === "Invalid date") {
-              throw new Error('Invalid Date, try again!')
-            }
+          isDate: {
+            msg: "Please provide date in YYYY-MM-DD format."
           }
         }
       },
       returned_on: {
         type: DataTypes.DATEONLY,
         allowNull: true,
-        defaultValue: null,
-        validations: {
-          len: {
-            args: [1, 10],
-            msg: "Please provide a return date!"
-          },
-          notEmpty: {
-            msg: "Please provide a return date!"
+        validate: {
+          notContains: {
+            args: ["Invalid date"],
+            msg: "Please provide date in YYYY-MM-DD format."
           },
           isDate: {
             msg: "Please provide date in YYYY-MM-DD format."
           },
-          isNotInvalidDateString(value) {
-            console.log("THIS IS THE isNotInvalidDateString value: ", value);
-            if(value === "Invalid date") {
-              throw new Error('Invalid Date, try again!')
-            }
-
-            if(this.return_by === "Invalid date") {
-              throw new Error('Invalid Date, try again!')
-            }
-          }
+          notEmpty: {
+            msg: "This field is required!"
+          },
         }
       }
     },

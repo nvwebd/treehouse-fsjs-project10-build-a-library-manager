@@ -58,7 +58,7 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: false,
         validate: {
           isInt: {
-            msg: "Only numbers are allowed for this field!"
+            msg: "Zip Code has to be a numeric value - Number"
           },
           notEmpty: {
             msg: "This field is required!"

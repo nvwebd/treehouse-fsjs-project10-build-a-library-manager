@@ -39,7 +39,11 @@ module.exports = (sequelize, DataTypes) => {
         allowNull: true,
         validate: {
           isInt: {
-            msg: "Zip Code has to be a Number!"
+            msg: "First Published has to be a Year - ex. 2018!"
+          },
+          len: {
+            args: [1, 4],
+            msg: "Year has to be from 1 - current year!"
           },
           isYearCompliant: (inputYear) => {
             const currentYear = new Date().getFullYear();
