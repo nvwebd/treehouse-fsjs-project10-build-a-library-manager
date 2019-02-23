@@ -14,7 +14,10 @@ router.get("/", (req, res) => {
 
   const query = {
     limit: 10,
-    offset: req.query.page ? req.query.page * 10 : null
+    offset: req.query.page ? req.query.page * 10 : null,
+    order: [
+      ['id', 'DESC']
+    ]
   };
 
   if (req.query.length !== 0 && req.query.page) {
@@ -42,6 +45,7 @@ router.get("/", (req, res) => {
           rowCount: books.count
         }),
         books: books.rows,
+        activeNavTab: 'books',
         activeTab: "all",
         searchType: "/books",
         search
@@ -68,6 +72,7 @@ router
       title: "Book Details",
       errors: {},
       prevValues: {},
+      activeNavTab: 'books',
       book,
       loans
     });
@@ -95,6 +100,7 @@ router
             book,
             prevValues,
             errors: formErrorCreator(error),
+            activeNavTab: 'books',
             loans: await models.loans.findAll({
               where: { book_id: req.params.id },
               include: [
@@ -114,17 +120,24 @@ router
   .get(async (req, res) => {
     res.render("pages/books/new_book", {
       title: "New Book",
+      activeNavTab: 'books',
       previousValues: {},
       errors: {}
     });
   })
   .post(async (req, res) => {
+    const bookData = {
+      ...req.body,
+      first_published: req.body.first_published === '' ? null : req.body.first_published
+    };
+
     models.books
-      .create(req.body)
+      .create(bookData)
       .then(() => res.redirect("/books"))
       .catch(error => {
         res.render("pages/books/new_book", {
           title: "New Book",
+          activeNavTab: 'books',
           previousValues: req.body,
           errors: formErrorCreator(error)
         });
@@ -165,6 +178,7 @@ router.get("/overdue_books", (req, res) => {
       res.render("pages/books/overdue_books", {
         title: "Overdue Books",
         activeTab: "overdue",
+        activeNavTab: 'books',
         count: loans.count,
         loans: loans.rows,
         pagination: pagination({
@@ -212,6 +226,7 @@ router.get("/checked_books", (req, res) => {
       res.render("pages/books/checked_books", {
         title: "Checked Books",
         activeTab: "checked",
+        activeNavTab: 'books',
         count: checkedBooks.count,
         checkedBooks: checkedBooks.rows,
         pagination: pagination({

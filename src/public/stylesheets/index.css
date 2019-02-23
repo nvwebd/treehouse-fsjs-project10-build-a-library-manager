@@ -116,12 +116,27 @@ table {
 /* PAGINATION */
 
 .pagination {
-    border: 1px solid black;
     text-align: center;
-    margin: 20px auto;
+    margin: 30px auto;
 }
 
 .current {
     color: darkred;
     font-size: 1.25em;
+}
+
+/* FORM */
+
+.search-form {
+    margin: 10px 0;
+}
+
+.search-form #search {
+    width: 400px;
+    margin-left: 0;
+}
+
+.search-form #submit {
+    margin-left: 20px;
+    padding: 12px 14px 12px;
 }

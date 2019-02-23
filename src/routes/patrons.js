@@ -23,6 +23,7 @@ router.get("/", async (req, res) => {
   const patrons = await models.patrons.findAndCountAll({
     offset: req.query.page * 10 || null,
     limit: 10,
+    order: [["id", "DESC"]],
     where: req.query.search
       ? { [Op.or]: searchBuilder({ searchType: "patrons", search }) }
       : null
@@ -30,6 +31,7 @@ router.get("/", async (req, res) => {
 
   res.render("pages/patrons/all_patrons", {
     title: "Patrons",
+    activeNavTab: "patrons",
     count: patrons.count,
     pagination: pagination({
       page: req.query.page || 1,
@@ -49,6 +51,7 @@ router
     const patron = await models.patrons.findByPk(id);
     const loans = await models.loans.findAll({
       where: { patron_id: id },
+      order: [["id", "DESC"]],
       include: [{ model: models.books, attributes: ["id", "title"] }]
     });
 
@@ -56,6 +59,7 @@ router
       patron,
       loans,
       errors: {},
+      activeNavTab: "patrons",
       title: "Patron Details"
     });
   })
@@ -70,6 +74,7 @@ router
             title: "Patron Details",
             previousValues: req.body,
             errors: formErrorCreator(error),
+            activeNavTab: "patrons",
             patron: await models.patrons.findByPk(id),
             loans: await models.loans.findAll({
               where: { patron_id: id },
@@ -84,6 +89,7 @@ router
   .route("/new")
   .get(async (req, res) => {
     res.render("pages/patrons/new_patron", {
+      activeNavTab: "patrons",
       prevValues: {},
       errors: {},
       title: "New Patron"
@@ -98,6 +104,7 @@ router
       .catch(error => {
         const prevValues = req.body;
         res.render("pages/patrons/new_patron", {
+          activeNavTab: "patrons",
           title: "New Patron",
           prevValues,
           errors: formErrorCreator(error)

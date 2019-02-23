@@ -6,7 +6,6 @@ const Op = sequelize.Op;
 const formErrorCreator = require("./../utils/formErrorFormatter");
 const dateFormater = require("./../utils/dateFormater");
 
-// define the home page route
 router.get("/", (req, res) => {
   models.loans
     .findAll({
@@ -17,6 +16,7 @@ router.get("/", (req, res) => {
       res.render("pages/loans/all_loans", {
         title: "Loans",
         activeTab: "all",
+        activeNavTab: "loans",
         loans
       });
     })
@@ -38,6 +38,7 @@ router
       title: "New Loan",
       errors: {},
       prevValues: {},
+      activeNavTab: "loans",
       books,
       patrons,
       loanedOnValue,
@@ -45,15 +46,19 @@ router
     });
   })
   .post((req, res) => {
-    console.log('req.body: ', req.body);
+    const loanData = {
+      ...req.body,
+      loaned_on: req.body.loaned_on === "" ? null : req.body.loaned_on,
+      return_by: req.body.return_by === "" ? null : req.body.return_by
+    };
+
     models.loans
-      .create(req.body)
+      .create(loanData)
       .then(() => {
         res.redirect("/loans");
       })
       .catch(async error => {
         const errors = formErrorCreator(error);
-        console.log('ERRORS => ', errors);
         const books = await models.books.findAll({
           attributes: ["id", "title"]
         });
@@ -69,6 +74,7 @@ router
 
         res.render("pages/loans/new_loan", {
           title: "New Loan",
+          activeNavTab: "loans",
           errors,
           prevValues,
           books,
@@ -86,7 +92,7 @@ router
       include: [
         {
           model: models.books,
-          attributes: ["title"]
+          attributes: ["id", "title"]
         },
         { model: models.patrons, attributes: ["first_name", "last_name"] }
       ]
@@ -94,23 +100,44 @@ router
 
     res.render("pages/books/return_book", {
       title: "Return Book",
+      activeNavTab: "loans",
       errors: {},
       loan,
       returned_on: dateFormater()
     });
   })
   .post(async (req, res) => {
-    const formData = req.body;
+    const formData = {
+      ...req.body
+    };
 
-    models.loans.findByPk(req.params.id).then(instance => {
+    const bookId = req.params.id;
+
+    models.loans.findOne({ where: { book_id: bookId } }).then(instance => {
       instance
         .update(formData)
         .then(() => {
           res.redirect("/loans");
         })
-        .catch(error => {
-          res.render("pages/loans/all_loans", {
+        .catch(async error => {
+          const bookId = req.params.id;
+          const loan = await models.loans.findOne({
+            where: { book_id: bookId },
+            include: [
+              {
+                model: models.books,
+                attributes: ["id", "title"]
+              },
+              { model: models.patrons, attributes: ["first_name", "last_name"] }
+            ]
+          });
+          res.render("pages/books/return_book", {
             title: "Return Book",
+            activeNavTab: "loans",
+            loan,
+            prevValues: {
+              return_by: formData
+            },
             errors: formErrorCreator(error)
           });
         });
@@ -137,6 +164,7 @@ router.get("/overdue_loans", (req, res) => {
       res.render("pages/loans/overdue_loans", {
         title: "Overdue Loans",
         activeTab: "overdue",
+        activeNavTab: "loans",
         loans
       });
     })
@@ -165,6 +193,7 @@ router.get("/checked_loans", (req, res) => {
       res.render("pages/loans/checked_loans", {
         title: "Checked Loans",
         activeTab: "checked",
+        activeNavTab: "loans",
         loans
       });
     })
