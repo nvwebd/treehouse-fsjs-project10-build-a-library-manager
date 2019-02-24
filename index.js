@@ -10,6 +10,7 @@ const app = express();
 const normalizePort = require("./src/utils/portNormalizer");
 const port = normalizePort.normalizePort(process.env.PORT || "3000");
 const helmet = require('helmet');
+const errorModule = require("./src/utils/errorModule");
 
 app.set("view engine", "pug");
 app.set("views", path.join(__dirname, "src/views"));
@@ -37,6 +38,26 @@ app.use("/", home);
 app.use("/books", books);
 app.use("/loans", loans);
 app.use("/patrons", patrons);
+
+app.use((err, req, res, next) => {
+  if (err.manualError) {
+    res.render('pages/error/error_page', errorModule({
+      stack: err.stack,
+      link: err.id ? `${err.link}/${err.id}` : `${err.link}`
+    }));
+  } else {
+    next(err)
+  }
+});
+
+/**
+ * when this middleware is triggered then the page was not found
+ */
+app.use((req, res, next) => {
+  const err = new Error("Not Found");
+  err.status = 404;
+  next(err);
+});
 
 // starting the server and listening on port 3000
 app.listen(port, () =>

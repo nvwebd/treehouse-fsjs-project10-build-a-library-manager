@@ -2,9 +2,9 @@ const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 
 /**
- * [exports all columns of the or function to search through a model]
- * @param  {[Object]} searchData [searchType: which table is to be searched, search: the search string]
- * @return {[type]}            [description]
+ *
+ * @param {Object} - searchData - the search string and the search type
+ * @returns {Array}
  */
 module.exports = ({ ...searchData }) => {
   switch (searchData.searchType) {
@@ -29,6 +29,6 @@ module.exports = ({ ...searchData }) => {
     }
 
     default:
-      return {};
+      return [];
   }
 };

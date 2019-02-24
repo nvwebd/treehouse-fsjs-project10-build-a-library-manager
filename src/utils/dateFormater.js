@@ -1,7 +1,7 @@
 /**
- * [exports function that creates a YYYY-MM-DD compliant Date string]
- * @param  {number} addDays [if addDays is present generate a Date for today + addDays]
- * @return {[String]}         [returns YYYY-MM-DD]
+ * exports function that creates a YYYY-MM-DD compliant Date string
+ * @param  {Number} addDays - if addDays is present generate a Date for today + addDays
+ * @return {String}         - returns YYYY-MM-DD]
  */
 module.exports = (addDays = 0) => {
   const nowDate = addDays

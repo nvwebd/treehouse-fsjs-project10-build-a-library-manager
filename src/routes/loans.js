@@ -6,6 +6,9 @@ const Op = sequelize.Op;
 const formErrorCreator = require("./../utils/formErrorFormatter");
 const dateFormater = require("./../utils/dateFormater");
 
+/**
+ * get all loans route
+ */
 router.get("/", (req, res) => {
   models.loans
     .findAll({
@@ -20,7 +23,14 @@ router.get("/", (req, res) => {
         loans
       });
     })
-    .catch(error => console.log(error));
+    .catch(error => {
+      const err = {
+        manualError: true,
+        stack: error,
+        link: "/loans"
+      };
+      next(err);
+    });
 });
 
 router
@@ -46,13 +56,20 @@ router
     });
   })
   .post((req, res) => {
-    const loanData = {
+  /**
+   * set loaned_on and return_by to null if they are empty
+   * @type {any}
+   */
+  const loanData = {
       ...req.body,
       loaned_on: req.body.loaned_on === "" ? null : req.body.loaned_on,
       return_by: req.body.return_by === "" ? null : req.body.return_by
     };
 
-    models.loans
+  /**
+   * create a new loan
+   */
+  models.loans
       .create(loanData)
       .then(() => {
         res.redirect("/loans");
@@ -86,7 +103,14 @@ router
 router
   .route("/return_book/:id")
   .get(async (req, res) => {
-    const bookId = req.params.id;
+  /**
+   * save book ID
+   */
+  const bookId = req.params.id;
+  /**
+   * find the loan for the book and update it as returned
+   * @type {TInstance | Model}
+   */
     const loan = await models.loans.findOne({
       where: { book_id: bookId },
       include: [
@@ -107,15 +131,14 @@ router
     });
   })
   .post(async (req, res) => {
-    const formData = {
-      ...req.body
-    };
-
+  /**
+   * save id
+   */
     const bookId = req.params.id;
 
     models.loans.findOne({ where: { book_id: bookId } }).then(instance => {
       instance
-        .update(formData)
+        .update(req.body)
         .then(() => {
           res.redirect("/loans");
         })
@@ -144,7 +167,13 @@ router
     });
   });
 
+/**
+ * get all overdue loans
+ */
 router.get("/overdue_loans", (req, res) => {
+  /**
+   * get all loans where return_by is less than todays date and returned_on is null
+   */
   models.loans
     .findAll({
       model: models.loans,
@@ -169,11 +198,22 @@ router.get("/overdue_loans", (req, res) => {
       });
     })
     .catch(error => {
-      console.log("ERROR fetching all overdue books: ", error);
+      const err = {
+        manualError: true,
+        stack: error,
+        link: "/loans/overdue_loans"
+      };
+      next(err);
     });
 });
 
+/**
+ * get all checked loans
+ */
 router.get("/checked_loans", (req, res) => {
+  /**
+   * find all loans where loaned_on and returned_on are null
+   */
   models.loans
     .findAll({
       model: models.loans,
@@ -198,7 +238,12 @@ router.get("/checked_loans", (req, res) => {
       });
     })
     .catch(error => {
-      console.log("ERROR getting checked books: ", error);
+      const err = {
+        manualError: true,
+        stack: error,
+        link: "/loans/checked_loans"
+      };
+      next(err);
     });
 });
 

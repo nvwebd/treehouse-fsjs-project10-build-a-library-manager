@@ -1,7 +1,7 @@
-/*
- * [exports an object of errors with key and value]
- * @param  {[Array]} errorArray [array of all errors returned from sequelize validation]
- * @return {[Object]}            [object of errors]
+/**
+ * exports an object of errors with key and value
+ * @param  {Object} errorArray  -   Object of all errors returned from sequelize validation]
+ * @return {Object}                 object of errors]
  */
 module.exports = errorArray => {
   const errors = {};

@@ -5,21 +5,20 @@ const Sequelize = require("sequelize");
 const Op = Sequelize.Op;
 const pagination = require("./../utils/pagination");
 const searchBuilder = require("./../utils/searchBuilder");
+const formErrorCreator = require("./../utils/formErrorFormatter");
 
-const formErrorCreator = errorArray => {
-  const errors = {};
-
-  errorArray.errors.map(
-    error => (errors[error.path] = { message: error.message })
-  );
-
-  return errors;
-};
-
-// define the home page route
+// patrons route
 router.get("/", async (req, res) => {
+  /**
+   * save search parameters or set them of empty
+   * @type {*|string}
+   */
   const search = req.query.search || "";
 
+  /**
+   * find all patrons and count them
+   * @type {{count: Integer, rows: Model[]}|{rows: TInstance[]; count: number}}
+   */
   const patrons = await models.patrons.findAndCountAll({
     offset: req.query.page * 10 || null,
     limit: 10,
@@ -44,12 +43,28 @@ router.get("/", async (req, res) => {
   });
 });
 
+/**
+ * patron_details route
+ */
 router
   .route("/patron_details/:id")
   .get(async (req, res) => {
-    const id = req.params.id;
+  /**
+   * save id
+   */
+  const id = req.params.id;
+
+  /**
+   * find the patron based on ID
+   * @type {Model|TInstance}
+   */
     const patron = await models.patrons.findByPk(id);
-    const loans = await models.loans.findAll({
+
+  /**
+   * get all loans
+   * @type {Array<Model>|TInstance[]}
+   */
+  const loans = await models.loans.findAll({
       where: { patron_id: id },
       order: [["id", "DESC"]],
       include: [{ model: models.books, attributes: ["id", "title"] }]
@@ -64,27 +79,47 @@ router
     });
   })
   .post(async (req, res) => {
-    const id = req.params.id;
-    models.patrons.findByPk(id).then(instance => {
-      instance
-        .update(req.body)
-        .then(() => res.redirect("/patrons"))
-        .catch(async error => {
-          res.render("pages/patrons/patron_detail", {
-            title: "Patron Details",
-            previousValues: req.body,
-            errors: formErrorCreator(error),
-            activeNavTab: "patrons",
-            patron: await models.patrons.findByPk(id),
-            loans: await models.loans.findAll({
-              where: { patron_id: id },
-              include: [{ model: models.books, attributes: ["id", "title"] }]
-            })
+  /**
+   * save id
+   */
+  const id = req.params.id;
+  /**
+   * find patron instance by id and update it
+   */
+    models.patrons
+      .findByPk(id)
+      .then(instance => {
+        instance
+          .update(req.body)
+          .then(() => res.redirect("/patrons"))
+          .catch(async error => {
+            res.render("pages/patrons/patron_detail", {
+              title: "Patron Details",
+              previousValues: req.body,
+              errors: formErrorCreator(error),
+              activeNavTab: "patrons",
+              patron: await models.patrons.findByPk(id),
+              loans: await models.loans.findAll({
+                where: { patron_id: id },
+                include: [{ model: models.books, attributes: ["id", "title"] }]
+              })
+            });
           });
-        });
-    });
+      })
+      .catch(error => {
+        const err = {
+          manualError: true,
+          stack: error,
+          id,
+          link: "/patrons/patron_details/"
+        };
+        next(err);
+      });
   });
 
+/**
+ * create new patron route
+ */
 router
   .route("/new")
   .get(async (req, res) => {
@@ -96,7 +131,10 @@ router
     });
   })
   .post(async (req, res) => {
-    models.patrons
+  /**
+   * create a patron and redirect to patrons page or return an error
+   */
+  models.patrons
       .create(req.body)
       .then(() => {
         res.redirect("/patrons");
