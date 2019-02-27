@@ -9,7 +9,7 @@ const dateFormater = require("./../utils/dateFormater");
 /**
  * get all loans route
  */
-router.get("/", (req, res) => {
+router.get("/", (req, res, next) => {
   models.loans
     .findAll({
       model: models.loans,
@@ -109,7 +109,7 @@ router
   const bookId = req.params.id;
   /**
    * find the loan for the book and update it as returned
-   * @type {TInstance | Model}
+   * @type {Model}
    */
     const loan = await models.loans.findOne({
       where: { book_id: bookId },
@@ -159,7 +159,7 @@ router
             activeNavTab: "loans",
             loan,
             prevValues: {
-              return_by: formData
+              returned_on: req.body.returned_on || ''
             },
             errors: formErrorCreator(error)
           });
